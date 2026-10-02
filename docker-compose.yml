@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  sitepulse-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sitepulse-app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - SITEPULSE_ENV=production
+      - SITEPULSE_DB_PATH=/app/data/serving_db.duckdb
+      - SITEPULSE_LAKEHOUSE_DIR=/app/data/lakehouse
+      - SITEPULSE_METADATA_DIR=/app/data/metadata
+    volumes:
+      - sitepulse_data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  sitepulse_data:
+    driver: local

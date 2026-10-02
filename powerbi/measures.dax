@@ -1,0 +1,125 @@
+// ============================================================================
+// SitePulse: Enterprise Power BI DAX Semantic Measures
+// Target Domain: Digital Analytics, Content Ops & Telemetry Quality
+// Compatible: Power BI Desktop, Power BI Service, Fabric Semantic Models
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// 1. VOLUME & TRAFFIC METRICS
+// ----------------------------------------------------------------------------
+
+[Total Sessions] = 
+DISTINCTCOUNT(fact_sessions[session_id])
+
+[Total Visitors] = 
+DISTINCTCOUNT(fact_sessions[visitor_id])
+
+[Total Pageviews] = 
+SUM(fact_sessions[page_view_count])
+
+[Average Session Duration (Sec)] = 
+AVERAGE(fact_sessions[duration_seconds])
+
+[Bounce Rate] = 
+DIVIDE(
+    CALCULATE(
+        COUNTROWS(fact_sessions),
+        fact_sessions[page_view_count] <= 1 && fact_sessions[duration_seconds] < 10
+    ),
+    [Total Sessions],
+    0.0
+)
+
+// ----------------------------------------------------------------------------
+// 2. CONVERSION & COMMERCIAL REVENUE METRICS
+// ----------------------------------------------------------------------------
+
+[Total Conversions] = 
+DISTINCTCOUNT(fact_conversions[order_id])
+
+[Total Revenue] = 
+COALESCE(SUM(fact_conversions[revenue]), 0.0)
+
+[Conversion Rate] = 
+DIVIDE([Total Conversions], [Total Sessions], 0.0)
+
+[Average Order Value (AOV)] = 
+DIVIDE([Total Revenue], [Total Conversions], 0.0)
+
+[Revenue Per Session (RPS)] = 
+DIVIDE([Total Revenue], [Total Sessions], 0.0)
+
+// ----------------------------------------------------------------------------
+// 3. SEGMENT CONVERSION & DIVERGENCE METRICS
+// ----------------------------------------------------------------------------
+
+[Mobile Sessions] = 
+CALCULATE(
+    [Total Sessions],
+    dim_device[device_type] = "mobile"
+)
+
+[Mobile Conversions] = 
+CALCULATE(
+    [Total Conversions],
+    dim_device[device_type] = "mobile"
+)
+
+[Mobile Conversion Rate] = 
+DIVIDE([Mobile Conversions], [Mobile Sessions], 0.0)
+
+[Desktop Sessions] = 
+CALCULATE(
+    [Total Sessions],
+    dim_device[device_type] = "desktop"
+)
+
+[Desktop Conversions] = 
+CALCULATE(
+    [Total Conversions],
+    dim_device[device_type] = "desktop"
+)
+
+[Desktop Conversion Rate] = 
+DIVIDE([Desktop Conversions], [Desktop Sessions], 0.0)
+
+[Device Conversion Divergence %] = 
+IF(
+    [Desktop Conversion Rate] > 0,
+    DIVIDE([Desktop Conversion Rate] - [Mobile Conversion Rate], [Desktop Conversion Rate], 0.0),
+    0.0
+)
+
+// ----------------------------------------------------------------------------
+// 4. FINANCIAL EXPOSURE & CONVERSION GAP METRICS
+// ----------------------------------------------------------------------------
+
+[Target Baseline CR] = 0.05 // 5.0% expected baseline
+
+[Expected Mobile Conversions] = 
+ROUND([Mobile Sessions] * [Target Baseline CR], 0)
+
+[Mobile Conversion Gap] = 
+MAX(0, [Expected Mobile Conversions] - [Mobile Conversions])
+
+[Mobile Revenue Exposure ($)] = 
+[Mobile Conversion Gap] * 120.00 // Evaluated at $120.00 baseline AOV
+
+// ----------------------------------------------------------------------------
+// 5. DATA QUALITY & HEALTH SCORE INTEGRATION
+// ----------------------------------------------------------------------------
+
+[Site Quality Health Score] = 
+AVERAGE(quality_scores_daily[overall_score])
+
+[Composite Platform Reliability] = 
+0.50 * [Site Quality Health Score] + 
+0.50 * (
+    IF([Device Conversion Divergence %] > 0.70, 65.0, 100.0)
+)
+
+[Open Incident Count] = 
+CALCULATE(
+    COUNTROWS(incident_lifecycle),
+    incident_lifecycle[status] IN {"DETECTED", "TRIAGED", "INVESTIGATING"}
+)

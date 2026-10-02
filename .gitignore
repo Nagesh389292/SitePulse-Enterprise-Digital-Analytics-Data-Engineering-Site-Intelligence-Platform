@@ -1,0 +1,32 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest & Caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local databases & lakehouse data
+data/
+*.duckdb
+*.duckdb.wal
+
+# Spark & Iceberg local logs and metastore
+metastore_db/
+derby.log
+.spark-warehouse/
+*.parquet
+
+# Virtual Environments
+venv/
+.env/
+env/
+.venv/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

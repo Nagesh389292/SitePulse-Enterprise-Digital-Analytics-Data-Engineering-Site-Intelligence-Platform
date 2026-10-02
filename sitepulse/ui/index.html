@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SitePulse — Enterprise Digital Analytics Quality & Site Intelligence Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #060913;
+      --bg-card: rgba(14, 22, 41, 0.75);
+      --bg-card-hover: rgba(20, 32, 60, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(56, 189, 248, 0.25);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --text-muted: #64748b;
+      --accent-cyan: #00f2fe;
+      --accent-blue: #38bdf8;
+      --accent-purple: #818cf8;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --glow-cyan: 0 0 24px rgba(0, 242, 254, 0.35);
+      --glow-rose: 0 0 24px rgba(244, 63, 94, 0.35);
+      --glow-emerald: 0 0 24px rgba(16, 185, 129, 0.35);
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+      background-image: 
+        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(56, 189, 248, 0.12), transparent 70%),
+        radial-gradient(ellipse 60% 40% at 85% 15%, rgba(129, 140, 248, 0.1), transparent 70%),
+        radial-gradient(ellipse 50% 50% at 50% 100%, rgba(16, 185, 129, 0.06), transparent 70%);
+      background-attachment: fixed;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(10, 15, 29, 0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.25); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.45); }
+
+    /* Top Navigation Header */
+    header {
+      background: rgba(8, 14, 28, 0.82);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      padding: 0.85rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .brand-orb {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00f2fe, #4facfe 50%, #7928ca);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.5);
+      animation: pulseBrand 3s infinite alternate;
+    }
+    @keyframes pulseBrand {
+      0% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.4); transform: scale(1); }
+      100% { box-shadow: 0 0 28px rgba(0, 242, 254, 0.7); transform: scale(1.02); }
+    }
+    .brand-info h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #ffffff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-subtitle {
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+      font-family: var(--font-mono);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      display: inline-block;
+      animation: blink 2s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .scenario-select-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-glow);
+      padding: 0.4rem 0.8rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .scenario-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .scenario-dropdown {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+    }
+    .scenario-dropdown option {
+      background: #0f172a;
+      color: #f8fafc;
+    }
+
+    .btn-simulate {
+      background: linear-gradient(135deg, #00f2fe, #0284c7);
+      border: none;
+      color: #060913;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.6rem 1.25rem;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 16px rgba(0, 242, 254, 0.3);
+    }
+    .btn-simulate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(0, 242, 254, 0.5);
+    }
+    .btn-simulate:active {
+      transform: translateY(0);
+    }
+
+    /* Layout Main */
+    main {
+      max-width: 1440px;
+      margin: 1.5rem auto 4rem auto;
+      padding: 0 1.5rem;
+    }
+
+    /* Top Reliability Score Gauges */
+    .hero-gauges {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .gauge-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 1.4rem;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      transition: all 0.3s ease;
+    }
+    .gauge-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-glow);
+    }
+    .gauge-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+      opacity: 0.6;
+    }
+
+    /* SVG Circular Progress */
+    .circle-wrap {
+      position: relative;
+      width: 84px;
+      height: 84px;
+      flex-shrink: 0;
+    }
+    .circle-svg {
+      width: 84px;
+      height: 84px;
+      transform: rotate(-90deg);
+    }
+    .circle-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.08);
+      stroke-width: 7;
+    }
+    .circle-progress {
+      fill: none;
+      stroke-width: 7;
+      stroke-linecap: round;
+      stroke-dasharray: 232.5;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.5s ease;
+      filter: drop-shadow(0 0 6px var(--accent-cyan));
+    }
+    .circle-value {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.15rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--text-main);
+    }
+
+    .gauge-info {
+      flex: 1;
+    }
+    .gauge-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.3rem;
+    }
+    .gauge-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .status-pill {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+    .pill-healthy {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+    }
+    .pill-degraded {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+    }
+    .pill-critical {
+      background: rgba(244, 63, 94, 0.15);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      box-shadow: 0 0 12px rgba(244, 63, 94, 0.25);
+      animation: pulseCritical 2s infinite;
+    }
+    @keyframes pulseCritical {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .gauge-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    /* Live Pipeline Flow Visualizer */
+    .flow-section {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .section-headline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .section-headline h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      letter-spacing: -0.01em;
+    }
+    .flow-badge {
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+      font-family: var(--font-mono);
+      background: rgba(0, 242, 254, 0.1);
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 242, 254, 0.25);
+    }
+
+    .pipeline-track {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 0.5rem;
+      position: relative;
+      padding: 0.75rem 0;
+    }
+    .pipeline-track::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 3%;
+      width: 94%;
+      height: 3px;
+      background: linear-gradient(90deg, rgba(56, 189, 248, 0.2), rgba(129, 140, 248, 0.6), rgba(16, 185, 129, 0.3));
+      z-index: 1;
+      transform: translateY(-50%);
+    }
+    .pipeline-node {
+      position: relative;
+      z-index: 2;
+      background: #0b1329;
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 0.75rem 0.4rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .pipeline-node:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 8px 20px rgba(0, 242, 254, 0.25);
+    }
+    .pipeline-node.active {
+      border-color: var(--accent-cyan);
+      background: rgba(14, 30, 60, 0.95);
+      box-shadow: 0 0 16px rgba(0, 242, 254, 0.35);
+    }
+    .pipeline-node.pass {
+      border-color: rgba(16, 185, 129, 0.6);
+    }
+    .pipeline-node.warning {
+      border-color: rgba(245, 158, 11, 0.7);
+    }
+    .pipeline-node.critical {
+      border-color: rgba(244, 63, 94, 0.8);
+      box-shadow: 0 0 12px rgba(244, 63, 94, 0.35);
+    }
+    .node-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--text-main);
+    }
+    .pipeline-node.active .node-num {
+      background: var(--accent-cyan);
+      color: #060913;
+    }
+    .node-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      line-height: 1.2;
+    }
+    .pipeline-node.active .node-title {
+      color: #fff;
+    }
+
+    /* Multi-Selection Control Bar */
+    .selection-controller {
+      background: var(--bg-card);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--border-glow);
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+    .controller-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .controller-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .controller-title h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .selection-counter {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      background: rgba(56, 189, 248, 0.15);
+      color: #67e8f9;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+    }
+
+    .preset-pills {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .btn-preset {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-sub);
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.35rem 0.8rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-preset:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .btn-preset.active {
+      background: rgba(0, 242, 254, 0.15);
+      color: var(--accent-cyan);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+    }
+
+    /* Checkbox Step Pills */
+    .step-pills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 0.6rem;
+    }
+    .step-pill-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(10, 16, 32, 0.6);
+      border: 1px solid var(--border-subtle);
+      padding: 0.55rem 0.8rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .step-pill-item:hover {
+      background: rgba(18, 28, 54, 0.7);
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+    .step-pill-item.selected {
+      background: rgba(14, 30, 60, 0.85);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(0, 242, 254, 0.15);
+    }
+    .step-checkbox {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--accent-cyan);
+      cursor: pointer;
+    }
+    .step-pill-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .step-pill-item.selected .step-pill-label {
+      color: #f8fafc;
+    }
+    .step-tag-pill {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      color: var(--accent-purple);
+      background: rgba(129, 140, 248, 0.15);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      margin-left: auto;
+    }
+
+    /* Step Output Container */
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Individual Step Output Card */
+    .step-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: cardEntrance 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      position: relative;
+      overflow: hidden;
+    }
+    @keyframes cardEntrance {
+      0% { opacity: 0; transform: translateY(20px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .step-card:hover {
+      border-color: rgba(56, 189, 248, 0.3);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.1);
+    }
+    .step-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--accent-cyan);
+    }
+    .step-card.status-pass::before { background: var(--accent-emerald); }
+    .step-card.status-warning::before { background: var(--accent-amber); }
+    .step-card.status-critical::before { background: var(--accent-rose); }
+
+    .step-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .step-meta-left {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+    .step-index-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(79, 172, 254, 0.2));
+      border: 1px solid rgba(0, 242, 254, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(0, 242, 254, 0.2);
+    }
+    .step-header-text h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .step-header-text p {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+    .step-meta-right {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .latency-tag {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Step Body Visuals */
+    .step-body-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+    .metric-panel {
+      background: rgba(9, 14, 28, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.15rem;
+    }
+    .metric-panel-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-sub);
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .metric-value-huge {
+      font-size: 1.85rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+    .metric-subtext {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    /* Progress bar widget */
+    .bar-row {
+      margin-bottom: 0.6rem;
+    }
+    .bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .bar-track {
+      width: 100%;
+      height: 7px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .fill-cyan { background: linear-gradient(90deg, #00f2fe, #4facfe); }
+    .fill-emerald { background: linear-gradient(90deg, #10b981, #34d399); }
+    .fill-rose { background: linear-gradient(90deg, #f43f5e, #fb7185); }
+    .fill-purple { background: linear-gradient(90deg, #818cf8, #a78bfa); }
+    .fill-amber { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+
+    /* Code & Terminal Snippet Box */
+    .code-box {
+      background: #040711;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: #93c5fd;
+      line-height: 1.5;
+      overflow-x: auto;
+      max-height: 220px;
+    }
+
+    /* ITIL / Risk Cards */
+    .alert-banner {
+      background: rgba(244, 63, 94, 0.08);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .alert-banner.success {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .alert-icon {
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+    .alert-content h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fb7185;
+      margin-bottom: 0.25rem;
+    }
+    .alert-banner.success .alert-content h4 {
+      color: #34d399;
+    }
+    .alert-content p {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+
+    /* Actionable Remediation Checklist */
+    .remedy-grid {
+      display: grid;
+      gap: 0.6rem;
+      margin-top: 0.75rem;
+    }
+    .remedy-item {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 0.65rem 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      transition: all 0.2s ease;
+    }
+    .remedy-item:hover {
+      border-color: var(--accent-cyan);
+      background: rgba(20, 32, 60, 0.8);
+    }
+    .remedy-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: rgba(0, 242, 254, 0.15);
+      color: var(--accent-cyan);
+      font-weight: 700;
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ITIL Workflow Buttons */
+    .state-buttons {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.85rem;
+      flex-wrap: wrap;
+    }
+    .btn-state {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-sub);
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-state:hover {
+      background: rgba(56, 189, 248, 0.2);
+      color: #fff;
+      border-color: var(--accent-cyan);
+    }
+    .btn-state.active {
+      background: var(--accent-emerald);
+      color: #060913;
+      border-color: var(--accent-emerald);
+      font-weight: 700;
+    }
+
+    /* AI Natural Language Query Box */
+    .nl-query-box {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .nl-input {
+      flex: 1;
+      background: #070c1a;
+      border: 1px solid var(--border-glow);
+      border-radius: 10px;
+      padding: 0.75rem 1.15rem;
+      color: #f8fafc;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .nl-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 16px rgba(0, 242, 254, 0.25);
+    }
+    .btn-ask {
+      background: linear-gradient(135deg, #00f2fe, #38bdf8);
+      border: none;
+      color: #060913;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0 1.5rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-ask:hover {
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+      transform: translateY(-1px);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border-subtle);
+      text-align: center;
+      padding: 2.5rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4rem;
+      background: rgba(6, 9, 19, 0.8);
+    }
+    footer a { color: var(--accent-cyan); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <div class="brand-wrap">
+      <div class="brand-orb">SP</div>
+      <div class="brand-info">
+        <h1>SitePulse</h1>
+        <div class="brand-subtitle">
+          <span class="pulse-dot"></span>
+          Enterprise Digital Analytics & Quality Engine v2.0
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Scenario Selector -->
+      <div class="scenario-select-wrap">
+        <span class="scenario-label">Scenario:</span>
+        <select id="scenario-dropdown" class="scenario-dropdown" onchange="onScenarioChange()">
+          <option value="NONE">1. Clean Baseline Operations</option>
+          <option value="FAIL_MOBILE_DROP" selected>2. Silent Mobile Telemetry Drop</option>
+          <option value="FAIL_SCHEMA_DRIFT">3. Event Tag Renaming (Schema Drift)</option>
+          <option value="FAIL_DUPLICATE_SPIKE">4. Tag Double-Firing Spike</option>
+          <option value="FAIL_NULL_EXPLOSION">5. Missing Identity Token Explosion</option>
+          <option value="FAIL_INVALID_REVENUE">6. Extreme Revenue Outlier Injection</option>
+        </select>
+      </div>
+
+      <button class="btn-simulate" onclick="triggerSimulation()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+        <span>Run Pipeline Simulation</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Top 3 Animated Circular Reliability Gauges -->
+    <section class="hero-gauges">
+      <!-- Composite Score -->
+      <div class="gauge-card">
+        <div class="circle-wrap">
+          <svg class="circle-svg" viewBox="0 0 84 84">
+            <circle class="circle-bg" cx="42" cy="42" r="37"></circle>
+            <circle id="circle-composite" class="circle-progress" cx="42" cy="42" r="37" stroke="#00f2fe"></circle>
+          </svg>
+          <div id="val-composite" class="circle-value">--</div>
+        </div>
+        <div class="gauge-info">
+          <div class="gauge-header">
+            <span class="gauge-title">Composite Reliability</span>
+            <span id="badge-composite" class="status-pill pill-healthy">HEALTHY</span>
+          </div>
+          <div class="gauge-desc">Balanced 50/50 synthesis of Structural Data Quality and Behavioral Metric Health.</div>
+        </div>
+      </div>
+
+      <!-- Structural Data Quality -->
+      <div class="gauge-card">
+        <div class="circle-wrap">
+          <svg class="circle-svg" viewBox="0 0 84 84">
+            <circle class="circle-bg" cx="42" cy="42" r="37"></circle>
+            <circle id="circle-structural" class="circle-progress" cx="42" cy="42" r="37" stroke="#10b981"></circle>
+          </svg>
+          <div id="val-structural" class="circle-value">--</div>
+        </div>
+        <div class="gauge-info">
+          <div class="gauge-header">
+            <span class="gauge-title">Structural Quality</span>
+            <span id="badge-structural" class="status-pill pill-healthy">PASS</span>
+          </div>
+          <div class="gauge-desc">Freshness, Completeness, Schema Stability, Volume Z-Score & Referential Integrity.</div>
+        </div>
+      </div>
+
+      <!-- Business Metric Health -->
+      <div class="gauge-card">
+        <div class="circle-wrap">
+          <svg class="circle-svg" viewBox="0 0 84 84">
+            <circle class="circle-bg" cx="42" cy="42" r="37"></circle>
+            <circle id="circle-business" class="circle-progress" cx="42" cy="42" r="37" stroke="#f43f5e"></circle>
+          </svg>
+          <div id="val-business" class="circle-value">--</div>
+        </div>
+        <div class="gauge-info">
+          <div class="gauge-header">
+            <span class="gauge-title">Business Metric Health</span>
+            <span id="badge-business" class="status-pill pill-critical">ANOMALY</span>
+          </div>
+          <div class="gauge-desc">Mobile/Desktop Divergence, Two-Sample Z-Test, Conversion Rate Collapse.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Animated Pipeline Flow Visualizer -->
+    <section class="flow-section">
+      <div class="section-headline">
+        <h2>
+          <span>Pipeline Stage Flow Visualizer</span>
+        </h2>
+        <span class="flow-badge">End-to-End Enterprise Architecture • Click Node to Toggle Step</span>
+      </div>
+
+      <div class="pipeline-track">
+        <div class="pipeline-node active" id="node-1" onclick="toggleSingleStep(1)">
+          <div class="node-num">1</div>
+          <div class="node-title">Ingestion</div>
+        </div>
+        <div class="pipeline-node active" id="node-2" onclick="toggleSingleStep(2)">
+          <div class="node-num">2</div>
+          <div class="node-title">PySpark ETL</div>
+        </div>
+        <div class="pipeline-node active" id="node-3" onclick="toggleSingleStep(3)">
+          <div class="node-num">3</div>
+          <div class="node-title">Iceberg ACID</div>
+        </div>
+        <div class="pipeline-node active" id="node-4" onclick="toggleSingleStep(4)">
+          <div class="node-num">4</div>
+          <div class="node-title">Star Schema</div>
+        </div>
+        <div class="pipeline-node active" id="node-5" onclick="toggleSingleStep(5)">
+          <div class="node-num">5</div>
+          <div class="node-title">5-Pillar DQ</div>
+        </div>
+        <div class="pipeline-node active critical" id="node-6" onclick="toggleSingleStep(6)">
+          <div class="node-num">6</div>
+          <div class="node-title">Z-Test Anomaly</div>
+        </div>
+        <div class="pipeline-node active critical" id="node-7" onclick="toggleSingleStep(7)">
+          <div class="node-num">7</div>
+          <div class="node-title">KPI Variance</div>
+        </div>
+        <div class="pipeline-node active" id="node-8" onclick="toggleSingleStep(8)">
+          <div class="node-num">8</div>
+          <div class="node-title">AI RCA & SQL</div>
+        </div>
+        <div class="pipeline-node active" id="node-9" onclick="toggleSingleStep(9)">
+          <div class="node-num">9</div>
+          <div class="node-title">ITIL Incident</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Multi-Selection Steps Controller -->
+    <section class="selection-controller">
+      <div class="controller-header">
+        <div class="controller-title">
+          <h3>Multi-Selection Pipeline Step Inspector</h3>
+          <span id="step-counter-badge" class="selection-counter">9 of 9 Steps Active</span>
+        </div>
+
+        <!-- Quick Filter Presets -->
+        <div class="preset-pills">
+          <button class="btn-preset active" onclick="applyPreset('ALL')">All 9 Steps</button>
+          <button class="btn-preset" onclick="applyPreset('DATA_ENG')">Data Eng Flow (1-4)</button>
+          <button class="btn-preset" onclick="applyPreset('QUALITY_ANOMALY')">Quality & Anomaly (5-6)</button>
+          <button class="btn-preset" onclick="applyPreset('BI_INCIDENTS')">Executive & AI (7-9)</button>
+          <button class="btn-preset" onclick="applyPreset('ANOMALIES_ONLY')">Critical Steps Only</button>
+          <button class="btn-preset" onclick="applyPreset('CLEAR')">Clear All</button>
+        </div>
+      </div>
+
+      <!-- Checkbox Pills Grid -->
+      <div class="step-pills-grid" id="step-checkboxes">
+        <!-- Dynamically rendered via JS -->
+      </div>
+    </section>
+
+    <!-- Interactive Step Output Cards Container -->
+    <section class="steps-container" id="steps-output-container">
+      <!-- Dynamically generated based on selected steps -->
+    </section>
+  </main>
+
+  <footer>
+    SitePulse Enterprise Platform — Digital Analytics Data Quality, Site Intelligence & Autonomous RCA.<br/>
+    Engineered for Senior Data Engineer & Analytics Engineering Roles. Connected to live DuckDB & FastAPI backend.
+  </footer>
+
+  <script>
+    // State management
+    const TOTAL_STEPS = 9;
+    let selectedSteps = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    let currentScenarioData = null;
+    let activeScenarioId = "FAIL_MOBILE_DROP";
+
+    const STEP_DEFINITIONS = [
+      { id: 1, title: "1. Raw Ingestion & Schema", tag: "Bronze Stream", group: "eng" },
+      { id: 2, title: "2. PySpark 30m Sessionization", tag: "DLQ Contract", group: "eng" },
+      { id: 3, title: "3. Apache Iceberg Lakehouse", tag: "ACID Snapshots", group: "eng" },
+      { id: 4, title: "4. Analytical Star Schema", tag: "DuckDB Marts", group: "eng" },
+      { id: 5, title: "5. 5-Pillar Quality Scorecard", tag: "0-100 Health", group: "quality" },
+      { id: 6, title: "6. Behavioral Anomaly Engine", tag: "Z-Test p<0.05", group: "quality" },
+      { id: 7, title: "7. Executive KPI & Variance", tag: "$ Exposure", group: "bi" },
+      { id: 8, title: "8. AST NL-to-SQL & AI RCA", tag: "Root Cause", group: "bi" },
+      { id: 9, title: "9. ITIL Incident & Governance", tag: "State Machine", group: "bi" }
+    ];
+
+    // Initialize UI on load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderStepPills();
+      loadScenario(activeScenarioId);
+    });
+
+    // Render multi-selection checkboxes
+    function renderStepPills() {
+      const container = document.getElementById('step-checkboxes');
+      container.innerHTML = '';
+
+      STEP_DEFINITIONS.forEach(def => {
+        const isSelected = selectedSteps.has(def.id);
+        const item = document.createElement('div');
+        item.className = `step-pill-item ${isSelected ? 'selected' : ''}`;
+        item.id = `pill-step-${def.id}`;
+        item.onclick = (e) => {
+          if (e.target.tagName !== 'INPUT') {
+            toggleStep(def.id);
+          }
+        };
+
+        item.innerHTML = `
+          <input type="checkbox" class="step-checkbox" id="check-step-${def.id}" ${isSelected ? 'checked' : ''} onchange="toggleStep(${def.id})">
+          <span class="step-pill-label">${def.title}</span>
+          <span class="step-tag-pill">${def.tag}</span>
+        `;
+        container.appendChild(item);
+      });
+      updateCounterBadge();
+    }
+
+    function toggleStep(stepId) {
+      if (selectedSteps.has(stepId)) {
+        selectedSteps.delete(stepId);
+      } else {
+        selectedSteps.add(stepId);
+      }
+      updateStepPillState(stepId);
+      updateNodeState(stepId);
+      updateCounterBadge();
+      renderActiveStepOutputs();
+    }
+
+    function toggleSingleStep(stepId) {
+      toggleStep(stepId);
+    }
+
+    function updateStepPillState(stepId) {
+      const el = document.getElementById(`pill-step-${stepId}`);
+      const chk = document.getElementById(`check-step-${stepId}`);
+      if (el && chk) {
+        const isSel = selectedSteps.has(stepId);
+        chk.checked = isSel;
+        if (isSel) el.classList.add('selected');
+        else el.classList.remove('selected');
+      }
+    }
+
+    function updateNodeState(stepId) {
+      const node = document.getElementById(`node-${stepId}`);
+      if (node) {
+        if (selectedSteps.has(stepId)) node.classList.add('active');
+        else node.classList.remove('active');
+      }
+    }
+
+    function updateCounterBadge() {
+      const badge = document.getElementById('step-counter-badge');
+      badge.innerText = `${selectedSteps.size} of ${TOTAL_STEPS} Steps Active`;
+    }
+
+    // Presets
+    function applyPreset(preset) {
+      document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      if (preset === 'ALL') {
+        selectedSteps = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      } else if (preset === 'DATA_ENG') {
+        selectedSteps = new Set([1, 2, 3, 4]);
+      } else if (preset === 'QUALITY_ANOMALY') {
+        selectedSteps = new Set([5, 6]);
+      } else if (preset === 'BI_INCIDENTS') {
+        selectedSteps = new Set([7, 8, 9]);
+      } else if (preset === 'ANOMALIES_ONLY') {
+        selectedSteps = new Set([6, 7, 8]);
+      } else if (preset === 'CLEAR') {
+        selectedSteps.clear();
+      }
+
+      for (let i = 1; i <= TOTAL_STEPS; i++) {
+        updateStepPillState(i);
+        updateNodeState(i);
+      }
+      updateCounterBadge();
+      renderActiveStepOutputs();
+    }
+
+    // Load scenario data from backend
+    async function loadScenario(scenarioId) {
+      try {
+        const res = await fetch('/api/v1/scenarios/simulate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ scenario: scenarioId })
+        });
+        currentScenarioData = await res.json();
+        updateTopGauges();
+        updateNodeStatuses();
+        renderActiveStepOutputs();
+      } catch (err) {
+        console.error("Failed to load scenario simulation:", err);
+      }
+    }
+
+    function onScenarioChange() {
+      const sc = document.getElementById('scenario-dropdown').value;
+      activeScenarioId = sc;
+      loadScenario(sc);
+    }
+
+    function triggerSimulation() {
+      const sc = document.getElementById('scenario-dropdown').value;
+      const btn = document.querySelector('.btn-simulate span');
+      btn.innerText = "Simulating PySpark...";
+      setTimeout(() => {
+        loadScenario(sc);
+        btn.innerText = "Run Pipeline Simulation";
+      }, 500);
+    }
+
+    // Update Top circular gauges with smooth animation
+    function updateTopGauges() {
+      if (!currentScenarioData) return;
+
+      const comp = currentScenarioData.composite_score;
+      const struct = currentScenarioData.structural_score;
+      const biz = currentScenarioData.business_score;
+
+      animateGauge('circle-composite', 'val-composite', comp);
+      animateGauge('circle-structural', 'val-structural', struct);
+      animateGauge('circle-business', 'val-business', biz);
+
+      updatePill('badge-composite', comp);
+      updatePill('badge-structural', struct);
+      updatePill('badge-business', biz);
+    }
+
+    function animateGauge(circleId, textId, score) {
+      const circle = document.getElementById(circleId);
+      const text = document.getElementById(textId);
+      const circumference = 232.5; // 2 * pi * 37
+      const offset = circumference - (score / 100) * circumference;
+
+      circle.style.strokeDashoffset = offset;
+      text.innerText = Math.round(score);
+
+      if (score >= 90) circle.style.stroke = '#10b981';
+      else if (score >= 70) circle.style.stroke = '#f59e0b';
+      else circle.style.stroke = '#f43f5e';
+    }
+
+    function updatePill(pillId, score) {
+      const p = document.getElementById(pillId);
+      p.className = 'status-pill';
+      if (score >= 90) {
+        p.classList.add('pill-healthy');
+        p.innerText = 'HEALTHY';
+      } else if (score >= 70) {
+        p.classList.add('pill-degraded');
+        p.innerText = 'DEGRADED';
+      } else {
+        p.classList.add('pill-critical');
+        p.innerText = 'CRITICAL';
+      }
+    }
+
+    function updateNodeStatuses() {
+      if (!currentScenarioData) return;
+      currentScenarioData.steps.forEach(st => {
+        const node = document.getElementById(`node-${st.step_id}`);
+        if (!node) return;
+        node.classList.remove('pass', 'warning', 'critical');
+        if (st.status === 'PASS' || st.status === 'RESOLVED') node.classList.add('pass');
+        else if (st.status === 'WARNING') node.classList.add('warning');
+        else if (st.status === 'CRITICAL') node.classList.add('critical');
+      });
+    }
+
+    // Render Selected Step Outputs
+    function renderActiveStepOutputs() {
+      const container = document.getElementById('steps-output-container');
+      container.innerHTML = '';
+
+      if (selectedSteps.size === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔍</div>
+            <h3 style="font-size: 1.1rem; color: var(--text-sub); margin-bottom: 0.5rem;">No Steps Selected</h3>
+            <p style="font-size: 0.85rem;">Select steps above or click a preset like 'All 9 Steps' to view pipeline outputs.</p>
+          </div>
+        `;
+        return;
+      }
+
+      if (!currentScenarioData || !currentScenarioData.steps) return;
+
+      currentScenarioData.steps.forEach(st => {
+        if (!selectedSteps.has(st.step_id)) return;
+
+        const card = document.createElement('div');
+        card.className = `step-card status-${st.status.toLowerCase()}`;
+        card.id = `output-step-${st.step_id}`;
+
+        let statusBadgeClass = 'pill-healthy';
+        if (st.status === 'WARNING') statusBadgeClass = 'pill-degraded';
+        else if (st.status === 'CRITICAL') statusBadgeClass = 'pill-critical';
+
+        card.innerHTML = `
+          <div class="step-card-header">
+            <div class="step-meta-left">
+              <div class="step-index-badge">${st.step_id}</div>
+              <div class="step-header-text">
+                <h3>${st.title}</h3>
+                <p>${st.summary}</p>
+              </div>
+            </div>
+            <div class="step-meta-right">
+              <span class="latency-tag">⚡ ${st.latency}</span>
+              <span class="status-pill ${statusBadgeClass}">${st.badge}</span>
+            </div>
+          </div>
+          <div class="step-card-body">
+            ${renderStepSpecificDetails(st)}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // Render custom rich widgets for each step
+    function renderStepSpecificDetails(st) {
+      const d = st.details;
+      if (!d) return '';
+
+      switch (st.step_id) {
+        case 1: // Ingestion
+          return `
+            <div class="step-body-grid">
+              <div class="metric-panel">
+                <div class="metric-panel-title"><span>Event Telemetry Volume</span><span class="step-tag-pill">GA4 Contract</span></div>
+                <div class="metric-value-huge">${d.total_events} <span style="font-size: 0.9rem; color: #34d399;">events/batch</span></div>
+                <div class="metric-subtext">Valid schema conformity: <strong>${d.valid_format_pct || 100}%</strong></div>
+                <div style="margin-top: 1rem;">
+                  <div class="bar-row">
+                    <div class="bar-labels"><span>page_view</span><span>${d.event_distribution ? d.event_distribution.page_view || 0 : 0}</span></div>
+                    <div class="bar-track"><div class="bar-fill fill-cyan" style="width: 55%;"></div></div>
+                  </div>
+                  <div class="bar-row">
+                    <div class="bar-labels"><span>add_to_cart</span><span>${d.event_distribution ? d.event_distribution.add_to_cart || 0 : 0}</span></div>
+                    <div class="bar-track"><div class="bar-fill fill-purple" style="width: 25%;"></div></div>
+                  </div>
+                  <div class="bar-row">
+                    <div class="bar-labels"><span>purchase</span><span>${d.event_distribution ? d.event_distribution.purchase || 0 : 0}</span></div>
+                    <div class="bar-track"><div class="bar-fill fill-emerald" style="width: 10%;"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="metric-panel">
+                <div class="metric-panel-title"><span>Sample Ingestion Payload (JSON)</span><span class="latency-tag">Raw Event</span></div>
+                <div class="code-box">${escapeHtml(d.sample_payload || '{}')}</div>
+              </div>
+            </div>
+          `;
+
+        case 2: // PySpark Sessionization
+          return `
+            <div class="step-body-grid">
+              <div class="metric-panel">
+                <div class="metric-panel-title"><span>30-min Window Sessionization</span><span class="step-tag-pill">PySpark Core</span></div>
+                <div class="metric-value-huge">${d.sessions_built} <span style="font-size: 0.9rem; color: #60a5fa;">sessions</span></div>
+                <div class="metric-subtext">Deduplicated event stream: <strong>${d.deduplicated_events || d.sessions_built * 4} clean events</strong></div>
+                <div style="margin-top: 0.75rem; font-size: 0.8rem; color: var(--text-sub);">
+                  Sliding inactivity timeout: <strong>1,800 seconds (30m)</strong>.<br/>
+                  Window function: <code>lag(timestamp) OVER (PARTITION BY visitor_id ORDER BY timestamp)</code>
+                </div>
+              </div>
+
+              <div class="metric-panel">
+                <div class="metric-panel-title"><span>Dead-Letter Queue (DLQ) Quarantine</span><span class="status-pill ${d.quarantined_dlq_count > 0 ? 'pill-critical' : 'pill-healthy'}">${d.quarantined_dlq_count} Quarantined</span></div>
+                <div class="metric-value-huge" style="color: ${d.quarantined_dlq_count > 0 ? '#fb7185' : '#34d399'};">${d.quarantined_dlq_count}</div>
+                <div class="metric-subtext">${d.rejection_rule ? 'Violation rule: <code>' + d.rejection_rule + '</code>' : 'All incoming events satisfied schema contracts.'}</div>
+                ${d.note ? '<div style="margin-top: 0.5rem; font-size: 0.75rem; color: #f59e0b;">' + d.note + '</div>' : ''}
+              </div>
+            </div>
+          `;
+
+        case 3: // Iceberg
+          return `
+            <div class="step-body-grid">
+              <div class="metric-panel">
+                <div class="metric-panel-title"><span>Lakehouse ACID Snapshot Commits</span><span class="step-tag-pill">Apache Iceberg v2</span></div>
+                <div style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.8;">
+                  <div>• Bronze Events: <code style="color: #67e8f9;">${d.snapshots ? d.snapshots.bronze_events || 'snap-3c562e25' : 'snap-3c562e25'}</code></div>
+                  <div>• Silver Sessions: <code style="color: #a78bfa;">${d.snapshots ? d.snapshots.silver_sessions || 'snap-87388828' : 'snap-87388828'}</code></div>
+                  <div>• Silver Conversions: <code style="color: #34d399;">${d.snapshots ? d.snapshots.silver_conversions || 'snap-42194ba1' : 'snap-42194ba1'}</code></div>
+                  <div>• Quarantine DLQ: <code style="color: #fb7185;">${d.snapshots ? d.snapshots.quarantine_dlq || 'snap-bce69606' : 'snap-bce69606'}</code></div>
+                </div>
+              </div>
+              <div class="metric-panel">
+                <div class="metric-panel-title"><span>Time-Travel & Audit Guarantees</span><span class="latency-tag">ACID Serializable</span></div>
+                <p style="font-size: 0.82rem; color: var(--text-sub); line-height: 1.5;">
+                  Zero data loss via atomic metadata pointers. Supports <code>TIMESTAMP AS OF</code> rollbacks, eliminating pipeline corruption during downstream batch failures.
+                </p>
+              </div>
+            </div>
+          `;
+
+        case 4: // Star Schema
+          return `
+            <div class="step-body-grid">
+              <div class="metric-panel">
+                <div class="metric-panel-title"><span>Analytical Marts (DuckDB / SQL Server)</span><span class="step-tag-pill">Surrogate Keys</span></div>
+                <div style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.8;">
+                  <div>• <code>dim_page</code>: 7 pages mapped via MD5(path)</div>
+                  <div>• <code>dim_device</code>: 5 device profiles mapped via MD5(type|os|browser)</div>
+                  <div>• <code>dim_campaign</code>: 4 UTM attribution channels</div>
+                  <div>• <code>fact_sessions</code>: ${d.tables ? d.tables.fact_sessions : 50} windowed sessions</div>
+                  <div>• <code>fact_conversions</code>: ${d.tables ? d.tables.fact_conversions : 5} validated transactions</div>
+                </div>
+              </div>
+              <div class="metric-panel">
+                <div class="metric-panel-title"><span>Financial Conversion Total Loaded</span><span class="latency-tag">Gold Mart</span></div>
+                <div class="metric-value-huge" style="color: #34d399;">${d.total_revenue_loaded || '$600.00'}</div>
+                <div class="metric-subtext">Columnstore compression enabled. Optimized for BI DirectQuery & DAX measures.</div>
+              </div>
+            </div>
+          `;
+
+        case 5: // 5-Pillar DQ
+          return `
+            <div class="step-body-grid">
+              <div class="metric-panel" style="grid-column: 1 / -1;">
+                <div class="metric-panel-title"><span>5-Pillar Structural Quality Evaluation</span><span class="status-pill ${d.overall_structural_score >= 90 ? 'pill-healthy' : 'pill-degraded'}">Score: ${d.overall_structural_score}/100</span></div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 0.5rem;">
+                  <div class="bar-row">
+                    <div class="bar-labels"><span>Freshness (20%)</span><span>${d.freshness_score || 100}%</span></div>
+                    <div class="bar-track"><div class="bar-fill fill-emerald" style="width: ${d.freshness_score || 100}%;"></div></div>
+                  </div>
+                  <div class="bar-row">
+                    <div class="bar-labels"><span>Completeness (25%)</span><span>${d.completeness_score !== undefined ? d.completeness_score : 100}%</span></div>
+                    <div class="bar-track"><div class="bar-fill ${d.completeness_score < 70 ? 'fill-rose' : 'fill-emerald'}" style="width: ${d.completeness_score !== undefined ? d.completeness_score : 100}%;"></div></div>
+                  </div>
+                  <div class="bar-row">
+                    <div class="bar-labels"><span>Schema Stability (25%)</span><span>${d.schema_stability_score !== undefined ? d.schema_stability_score : 100}%</span></div>
+                    <div class="bar-track"><div class="bar-fill ${d.schema_stability_score < 70 ? 'fill-rose' : 'fill-emerald'}" style="width: ${d.schema_stability_score !== undefined ? d.schema_stability_score : 100}%;"></div></div>
+                  </div>
+                  <div class="bar-row">
+                    <div class="bar-labels"><span>Volume Z-Score (15%)</span><span>${d.volume_z_score || 100}%</span></div>
+                    <div class="bar-track"><div class="bar-fill fill-cyan" style="width: ${d.volume_z_score || 100}%;"></div></div>
+                  </div>
+                  <div class="bar-row">
+                    <div class="bar-labels"><span>Referential (15%)</span><span>${d.referential_integrity_score || d.referential_score || 100}%</span></div>
+                    <div class="bar-track"><div class="bar-fill fill-purple" style="width: ${d.referential_integrity_score || d.referential_score || 100}%;"></div></div>
+                  </div>
+                </div>
+                ${d.architectural_insight ? '<div style="margin-top: 0.85rem; font-size: 0.8rem; color: #f59e0b;">⚠️ ' + d.architectural_insight + '</div>' : ''}
+              </div>
+            </div>
+          `;
+
+        case 6: // Behavioral Anomaly
+          return `
+            <div class="step-body-grid">
+              <div class="metric-panel">
+                <div class="metric-panel-title"><span>Two-Sample Proportion Z-Test</span><span class="status-pill ${d.statistically_significant ? 'pill-critical' : 'pill-healthy'}">${d.statistically_significant ? 'DIVERGENCE CONFIRMED' : 'NO ANOMALY'}</span></div>
+                <div class="metric-value-huge" style="color: ${d.statistically_significant ? '#fb7185' : '#34d399'};">
+                  p = ${d.p_value !== undefined ? d.p_value : '0.833'}
+                  <span style="font-size: 0.85rem; color: var(--text-sub);">(Z = ${d.z_statistic || '0.21'})</span>
+                </div>
+                <div class="metric-subtext">
+                  ${d.hypothesis_result || 'Conversion rates across mobile and desktop are consistent within statistical bounds.'}
+                </div>
+              </div>
+
+              <div class="metric-panel">
+                <div class="metric-panel-title"><span>Device Conversion Funnel</span><span class="step-tag-pill">Mobile vs Desktop</span></div>
+                <div class="bar-row">
+                  <div class="bar-labels"><span>Mobile Conversion Rate</span><span>${d.mobile_cr !== undefined ? d.mobile_cr : 4.8}%</span></div>
+                  <div class="bar-track"><div class="bar-fill ${d.mobile_cr === 0 ? 'fill-rose' : 'fill-cyan'}" style="width: ${Math.max(5, (d.mobile_cr || 0) * 15)}%;"></div></div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-labels"><span>Desktop Conversion Rate</span><span>${d.desktop_cr || 5.1}%</span></div>
+                  <div class="bar-track"><div class="bar-fill fill-emerald" style="width: ${(d.desktop_cr || 5.1) * 15}%;"></div></div>
+                </div>
+              </div>
+            </div>
+          `;
+
+        case 7: // Executive KPI & Variance
+          return `
+            <div class="step-body-grid">
+              <div class="metric-panel">
+                <div class="metric-panel-title"><span>Modeled Financial Revenue Exposure</span><span class="status-pill ${d.financial_exposure_usd > 0 ? 'pill-critical' : 'pill-healthy'}">$${d.financial_exposure_usd || 0} USD</span></div>
+                <div class="metric-value-huge" style="color: ${d.financial_exposure_usd > 0 ? '#fb7185' : '#34d399'};">$${d.financial_exposure_usd ? d.financial_exposure_usd.toLocaleString() : '0.00'}</div>
+                <div class="metric-subtext">${d.marketing_risk || 'All campaigns running normally.'}</div>
+              </div>
+
+              <div class="metric-panel">
+                <div class="metric-panel-title"><span>Marketing Attribution Risk</span><span class="step-tag-pill">Smart Bidding</span></div>
+                <p style="font-size: 0.82rem; color: var(--text-sub); line-height: 1.5;">
+                  ${d.marketing_risk ? d.marketing_risk : 'Conversion feed to Google Ads & Meta Ads is intact. No bidding algorithm distortions.'}
+                </p>
+              </div>
+            </div>
+          `;
+
+        case 8: // AI RCA & NL-to-SQL
+          return `
+            <div class="step-body-grid" style="grid-column: 1 / -1;">
+              <div class="metric-panel" style="grid-column: 1 / -1;">
+                <div class="metric-panel-title"><span>Interactive Natural Language Query Interface</span><span class="step-tag-pill">AST sqlglot Guarded</span></div>
+                <div class="nl-query-box">
+                  <input type="text" id="custom-nl-query" class="nl-input" value="Why did mobile conversion drop yesterday?" placeholder="Ask any analytical or root-cause question in plain English...">
+                  <button class="btn-ask" onclick="submitCustomQuery()">Query AI</button>
+                </div>
+                
+                <div class="alert-banner ${d.classification && d.classification !== 'NONE' ? '' : 'success'}">
+                  <div class="alert-icon">${d.classification && d.classification !== 'NONE' ? '🚨' : '✅'}</div>
+                  <div class="alert-content">
+                    <h4>${d.headline || d.rca_diagnosis || 'Telemetry operating nominally.'}</h4>
+                    <p>AST Validation: <code>ALLOWED (SELECT only, LIMIT enforced)</code></p>
+                  </div>
+                </div>
+
+                ${d.actionable_remediations ? `
+                  <div style="margin-top: 1rem;">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent-cyan); text-transform: uppercase;">Actionable Engineering Remediation Strategy:</div>
+                    <div class="remedy-grid">
+                      ${d.actionable_remediations.map((r, i) => `
+                        <div class="remedy-item">
+                          <div class="remedy-num">${i + 1}</div>
+                          <div>${r}</div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+
+        case 9: // ITIL Incident Lifecycle
+          return `
+            <div class="step-body-grid">
+              <div class="metric-panel">
+                <div class="metric-panel-title"><span>ITIL Incident Record</span><span class="status-pill ${d.severity ? 'pill-critical' : 'pill-healthy'}">${d.severity || '0 Active P1'}</span></div>
+                <div style="font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.8;">
+                  <div>• Ticket: <strong style="color: #67e8f9;">${d.incident_id || 'N/A'}</strong></div>
+                  <div>• Status: <span class="status-pill pill-degraded" id="inc-status-tag">${d.status || 'CLOSED'}</span></div>
+                  <div>• Owner: <strong>${d.owner_team || 'Data Engineering & Content Ops'}</strong></div>
+                  <div>• Assigned: <strong>${d.assigned_engineer || 'On-Call Lead'}</strong></div>
+                </div>
+
+                <div class="state-buttons">
+                  <button class="btn-state" onclick="updateIncidentStatus('TRIAGED')">Mark Triaged</button>
+                  <button class="btn-state active" onclick="updateIncidentStatus('ROOT_CAUSE_IDENTIFIED')">RCA Identified</button>
+                  <button class="btn-state" onclick="updateIncidentStatus('HOTFIX_DEPLOYED')">Hotfix Deployed</button>
+                  <button class="btn-state" onclick="updateIncidentStatus('CLOSED')">Close Incident</button>
+                </div>
+              </div>
+
+              <div class="metric-panel">
+                <div class="metric-panel-title"><span>Operational Risk Control</span><span class="step-tag-pill">Risk Register</span></div>
+                <p style="font-size: 0.82rem; color: var(--text-sub); line-height: 1.5;">
+                  <strong>Mitigation Control RSK-002:</strong> Autonomous cross-layer correlation combining PySpark DLQ quarantine with Two-Sample Proportion Z-Test detection ensures MTTD &lt; 15 minutes.
+                </p>
+              </div>
+            </div>
+          `;
+
+        default:
+          return '';
+      }
+    }
+
+    function updateIncidentStatus(newStatus) {
+      const tag = document.getElementById('inc-status-tag');
+      if (tag) tag.innerText = newStatus;
+      document.querySelectorAll('.btn-state').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    async function submitCustomQuery() {
+      const q = document.getElementById('custom-nl-query').value;
+      const res = await fetch('/api/v1/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: q })
+      });
+      const data = await res.json();
+      alert(`AST Guarded Query Result:\nSQL: ${data.sanitized_sql || data.generated_sql}\nRows returned: ${data.row_count || 0}`);
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>

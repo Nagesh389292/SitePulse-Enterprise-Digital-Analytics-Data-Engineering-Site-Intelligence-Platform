@@ -1,0 +1,169 @@
+{
+  "name": "SitePulse_Enterprise_Semantic_Model",
+  "compatibilityLevel": 1567,
+  "model": {
+    "culture": "en-US",
+    "dataSources": [
+      {
+        "type": "structured",
+        "name": "SitePulse_Lakehouse_Serving",
+        "connectionDetails": {
+          "protocol": "duckdb-sqlserver",
+          "address": "data/serving_db.duckdb"
+        }
+      }
+    ],
+    "tables": [
+      {
+        "name": "dim_device",
+        "columns": [
+          { "name": "device_key", "dataType": "string", "isKey": true },
+          { "name": "device_category", "dataType": "string" },
+          { "name": "browser", "dataType": "string" },
+          { "name": "os", "dataType": "string" }
+        ]
+      },
+      {
+        "name": "dim_page",
+        "columns": [
+          { "name": "page_key", "dataType": "string", "isKey": true },
+          { "name": "page_url", "dataType": "string" },
+          { "name": "page_type", "dataType": "string" },
+          { "name": "section", "dataType": "string" }
+        ]
+      },
+      {
+        "name": "dim_campaign",
+        "columns": [
+          { "name": "campaign_key", "dataType": "string", "isKey": true },
+          { "name": "campaign_name", "dataType": "string" },
+          { "name": "source", "dataType": "string" },
+          { "name": "medium", "dataType": "string" }
+        ]
+      },
+      {
+        "name": "fact_sessions",
+        "columns": [
+          { "name": "session_id", "dataType": "string", "isKey": true },
+          { "name": "visitor_id", "dataType": "string" },
+          { "name": "device_key", "dataType": "string" },
+          { "name": "landing_page_key", "dataType": "string" },
+          { "name": "campaign_key", "dataType": "string" },
+          { "name": "session_start", "dataType": "dateTime" },
+          { "name": "session_end", "dataType": "dateTime" },
+          { "name": "duration_seconds", "dataType": "int64" },
+          { "name": "page_view_count", "dataType": "int64" },
+          { "name": "has_cart", "dataType": "int64" },
+          { "name": "has_checkout", "dataType": "int64" },
+          { "name": "has_purchase", "dataType": "int64" },
+          { "name": "total_revenue", "dataType": "double" }
+        ]
+      },
+      {
+        "name": "fact_conversions",
+        "columns": [
+          { "name": "conversion_id", "dataType": "string", "isKey": true },
+          { "name": "session_id", "dataType": "string" },
+          { "name": "visitor_id", "dataType": "string" },
+          { "name": "device_key", "dataType": "string" },
+          { "name": "campaign_key", "dataType": "string" },
+          { "name": "page_key", "dataType": "string" },
+          { "name": "conversion_time", "dataType": "dateTime" },
+          { "name": "order_id", "dataType": "string" },
+          { "name": "revenue", "dataType": "double" }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "fact_sessions_dim_device",
+        "fromTable": "fact_sessions",
+        "fromColumn": "device_key",
+        "toTable": "dim_device",
+        "toColumn": "device_key",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "fact_sessions_dim_page",
+        "fromTable": "fact_sessions",
+        "fromColumn": "landing_page_key",
+        "toTable": "dim_page",
+        "toColumn": "page_key",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "fact_sessions_dim_campaign",
+        "fromTable": "fact_sessions",
+        "fromColumn": "campaign_key",
+        "toTable": "dim_campaign",
+        "toColumn": "campaign_key",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "fact_conversions_fact_sessions",
+        "fromTable": "fact_conversions",
+        "fromColumn": "session_id",
+        "toTable": "fact_sessions",
+        "toColumn": "session_id",
+        "crossFilteringBehavior": "bothDirections"
+      }
+    ],
+    "measures": [
+      {
+        "name": "Total Sessions",
+        "expression": "DISTINCTCOUNT(fact_sessions[session_id])",
+        "formatString": "#,0"
+      },
+      {
+        "name": "Total Conversions",
+        "expression": "DISTINCTCOUNT(fact_conversions[order_id])",
+        "formatString": "#,0"
+      },
+      {
+        "name": "Total Revenue",
+        "expression": "SUM(fact_conversions[revenue])",
+        "formatString": "$#,0.00"
+      },
+      {
+        "name": "Conversion Rate",
+        "expression": "DIVIDE([Total Conversions], [Total Sessions], 0)",
+        "formatString": "0.00%"
+      },
+      {
+        "name": "Mobile Conversion Rate",
+        "expression": "CALCULATE([Conversion Rate], dim_device[device_category] = \"mobile\")",
+        "formatString": "0.00%"
+      },
+      {
+        "name": "Desktop Conversion Rate",
+        "expression": "CALCULATE([Conversion Rate], dim_device[device_category] = \"desktop\")",
+        "formatString": "0.00%"
+      },
+      {
+        "name": "Device Conversion Divergence %",
+        "expression": "DIVIDE([Desktop Conversion Rate] - [Mobile Conversion Rate], [Desktop Conversion Rate], 0)",
+        "formatString": "+0.00%;-0.00%;0.00%"
+      },
+      {
+        "name": "Mobile Conversion Gap",
+        "expression": "MAX(0, [Desktop Conversion Rate] - [Mobile Conversion Rate])",
+        "formatString": "0.00%"
+      },
+      {
+        "name": "Mobile Revenue Exposure ($)",
+        "expression": "VAR MobileSessions = CALCULATE([Total Sessions], dim_device[device_category] = \"mobile\") VAR ExpectedConversions = MobileSessions * [Mobile Conversion Gap] VAR AOV = DIVIDE([Total Revenue], [Total Conversions], 65.0) RETURN ExpectedConversions * AOV",
+        "formatString": "$#,0.00"
+      },
+      {
+        "name": "Site Quality Health Score",
+        "expression": "AVERAGE(dim_page[page_quality_score])",
+        "formatString": "0.0"
+      },
+      {
+        "name": "Composite Platform Reliability",
+        "expression": "([Site Quality Health Score] * 0.4) + ((1 - [Mobile Conversion Gap]) * 100 * 0.6)",
+        "formatString": "0.0"
+      }
+    ]
+  }
+}

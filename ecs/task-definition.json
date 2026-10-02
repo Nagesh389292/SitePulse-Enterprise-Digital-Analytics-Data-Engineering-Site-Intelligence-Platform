@@ -1,0 +1,66 @@
+{
+  "family": "sitepulse-enterprise-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "2048",
+  "memory": "4096",
+  "executionRoleArn": "arn:aws:iam::123456789012:role/sitepulse-ecs-execution-role",
+  "taskRoleArn": "arn:aws:iam::123456789012:role/sitepulse-ecs-task-role",
+  "containerDefinitions": [
+    {
+      "name": "sitepulse-app",
+      "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/sitepulse:v2.0.0",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "hostPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "SITEPULSE_ENV", "value": "production" },
+        { "name": "SITEPULSE_DB_PATH", "value": "/mnt/efs/sitepulse/serving_db.duckdb" },
+        { "name": "SITEPULSE_LAKEHOUSE_DIR", "value": "s3://dentsu-sitepulse-lakehouse/data" },
+        { "name": "SITEPULSE_METADATA_DIR", "value": "s3://dentsu-sitepulse-lakehouse/metadata" }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "sitepulse-efs-volume",
+          "containerPath": "/mnt/efs/sitepulse",
+          "readOnly": false
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/sitepulse-enterprise",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "sitepulse"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:8000/api/v1/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 15
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "name": "sitepulse-efs-volume",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-0123456789abcdef0",
+        "rootDirectory": "/",
+        "transitEncryption": "ENABLED"
+      }
+    }
+  ]
+}
